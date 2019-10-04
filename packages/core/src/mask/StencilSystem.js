@@ -104,7 +104,7 @@ export class StencilSystem extends AbstractMaskSystem
         const gl = this.renderer.gl;
 
         gl.colorMask(true, true, true, true);
-        gl.stencilFunc(gl.EQUAL, this.maskStack.length, this._getBitwiseMask());
+        gl.stencilFunc(gl.EQUAL, this.getStackLength(), this._getBitwiseMask());
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
     }
 
@@ -115,6 +115,6 @@ export class StencilSystem extends AbstractMaskSystem
      */
     _getBitwiseMask()
     {
-        return (1 << this.maskStack.length) - 1;
+        return (1 << this.getStackLength()) - 1;
     }
 }
