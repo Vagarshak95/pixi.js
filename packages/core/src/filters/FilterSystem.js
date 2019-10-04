@@ -100,7 +100,7 @@ export class FilterSystem extends System
          * @member {Object[]}
          * @readonly
          */
-        this.defaultFilterStack = [{}];
+        this.defaultFilterStack = [new FilterState()];
 
         /**
          * stores a bunch of PO2 textures used for filtering

@@ -1,5 +1,6 @@
 import { BaseTexture } from '../textures/BaseTexture';
 import { Framebuffer } from '../framebuffer/Framebuffer';
+import { MaskData } from '../mask/MaskData';
 
 /**
  * A BaseRenderTexture is a special texture that allows any PixiJS display object to be rendered to it.
@@ -93,14 +94,14 @@ export class BaseRenderTexture extends BaseTexture
         /**
          * The data structure for the stencil masks.
          *
-         * @member {PIXI.Graphics[]}
+         * @member {PIXI.MaskData[]}
          */
-        this.stencilMaskStack = [];
+        this.stencilMaskStack = [new MaskData()];
 
         /**
          * The data structure for the filters.
          *
-         * @member {PIXI.Graphics[]}
+         * @member {Object[]}
          */
         this.filterStack = [{}];
     }
