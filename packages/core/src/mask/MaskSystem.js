@@ -84,7 +84,7 @@ export class MaskSystem extends System
             const d = this.maskDataPool.pop() || new MaskData();
 
             d.pooled = true;
-            d.element = maskData;
+            d.maskObject = maskData;
             maskData = d;
         }
 
@@ -138,7 +138,7 @@ export class MaskSystem extends System
                 this.renderer.scissor.pop();
                 break;
             case MASK_TYPES.STENCIL:
-                this.renderer.stencil.pop(maskData.element);
+                this.renderer.stencil.pop(maskData.maskObject);
                 break;
             case MASK_TYPES.SPRITE:
                 this.popSpriteMask();
@@ -156,14 +156,14 @@ export class MaskSystem extends System
     }
 
     /**
-     * Sets type of MaskData based on its element
+     * Sets type of MaskData based on its maskObject
      * @param {PIXI.MaskData} maskData
      */
     detect(maskData)
     {
-        const element = maskData.element;
+        const maskObject = maskData.maskObject;
 
-        if (element.isSprite)
+        if (maskObject.isSprite)
         {
             maskData.type = MASK_TYPES.SPRITE;
 
@@ -172,10 +172,10 @@ export class MaskSystem extends System
         maskData.type = MASK_TYPES.STENCIL;
         // detect scissor in graphics
         if (this.enableScissor
-            && element.isFastRect
-            && element.isFastRect())
+            && maskObject.isFastRect
+            && maskObject.isFastRect())
         {
-            const matrix = element.worldTransform;
+            const matrix = maskObject.worldTransform;
 
             let rot = Math.atan2(matrix.b, matrix.a);
 
@@ -196,21 +196,21 @@ export class MaskSystem extends System
      */
     pushSpriteMask(maskData)
     {
-        const { element } = maskData;
+        const { maskObject } = maskData;
         const target = maskData._target;
         let alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex];
 
         if (!alphaMaskFilter)
         {
-            alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex] = [new SpriteMaskFilter(element)];
+            alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex] = [new SpriteMaskFilter(maskObject)];
         }
 
         alphaMaskFilter[0].resolution = this.renderer.resolution;
-        alphaMaskFilter[0].maskSprite = element;
+        alphaMaskFilter[0].maskSprite = maskObject;
 
         const stashFilterArea = target.filterArea;
 
-        target.filterArea = element.getBounds(true);
+        target.filterArea = maskObject.getBounds(true);
         this.renderer.filter.push(target, alphaMaskFilter);
         target.filterArea = stashFilterArea;
 

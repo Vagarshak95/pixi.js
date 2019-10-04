@@ -38,15 +38,15 @@ export class ScissorSystem extends AbstractMaskSystem
      */
     push(maskData)
     {
-        const element = maskData.element;
+        const maskObject = maskData.maskObject;
 
-        element.renderable = true;
+        maskObject.renderable = true;
 
         const prevData = maskData._scissorRect;
-        const bounds = element.getBounds(true);
+        const bounds = maskObject.getBounds(true);
         const { gl } = this.renderer;
 
-        element.renderable = false;
+        maskObject.renderable = false;
 
         if (prevData)
         {

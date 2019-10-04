@@ -29,7 +29,7 @@ export class MaskData
          * Which element we use to mask
          * @member {PIXI.DisplayObject}
          */
-        this.element = null;
+        this.maskObject = null;
 
         /**
          * Whether it belongs to MaskSystem pool
@@ -78,7 +78,7 @@ export class MaskData
     {
         if (this.pooled)
         {
-            this.element = null;
+            this.maskObject = null;
 
             this.type = MASK_TYPES.NONE;
 

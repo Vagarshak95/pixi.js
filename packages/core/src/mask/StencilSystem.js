@@ -38,7 +38,7 @@ export class StencilSystem extends AbstractMaskSystem
      */
     push(maskData)
     {
-        const element = maskData.element;
+        const maskObject = maskData.maskObject;
         const { gl } = this.renderer;
         const prevMaskCount = maskData._stencilCounter;
 
@@ -56,10 +56,10 @@ export class StencilSystem extends AbstractMaskSystem
         gl.stencilFunc(gl.EQUAL, prevMaskCount, this._getBitwiseMask());
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
 
-        element.renderable = true;
-        element.render(this.renderer);
+        maskObject.renderable = true;
+        maskObject.render(this.renderer);
         this.renderer.batch.flush();
-        element.renderable = false;
+        maskObject.renderable = false;
 
         this._useCurrent();
     }
@@ -67,7 +67,7 @@ export class StencilSystem extends AbstractMaskSystem
     /**
      * Pops stencil mask. MaskData is already removed from stack
      *
-     * @param {PIXI.DisplayObject} displayObject - element of popped mask data
+     * @param {PIXI.DisplayObject} displayObject - maskObject of popped mask data
      */
     pop(displayObject)
     {
