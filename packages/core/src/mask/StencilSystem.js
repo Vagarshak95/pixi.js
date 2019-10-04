@@ -67,9 +67,9 @@ export class StencilSystem extends AbstractMaskSystem
     /**
      * Pops stencil mask. MaskData is already removed from stack
      *
-     * @param {PIXI.DisplayObject} displayObject - maskObject of popped mask data
+     * @param {PIXI.DisplayObject} maskObject - object of popped mask data
      */
-    pop(displayObject)
+    pop(maskObject)
     {
         const gl = this.renderer.gl;
 
@@ -86,10 +86,10 @@ export class StencilSystem extends AbstractMaskSystem
             gl.colorMask(false, false, false, false);
             gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
 
-            displayObject.renderable = true;
-            displayObject.render(this.renderer);
+            maskObject.renderable = true;
+            maskObject.render(this.renderer);
             this.renderer.batch.flush();
-            displayObject.renderable = false;
+            maskObject.renderable = false;
 
             this._useCurrent();
         }
