@@ -196,20 +196,21 @@ export class MaskSystem extends System
      */
     pushSpriteMask(maskData)
     {
+        const { element } = maskData;
         const target = maskData._target;
         let alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex];
 
         if (!alphaMaskFilter)
         {
-            alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex] = [new SpriteMaskFilter(target)];
+            alphaMaskFilter = this.alphaMaskPool[this.alphaMaskIndex] = [new SpriteMaskFilter(element)];
         }
 
         alphaMaskFilter[0].resolution = this.renderer.resolution;
-        alphaMaskFilter[0].maskSprite = target;
+        alphaMaskFilter[0].maskSprite = element;
 
         const stashFilterArea = target.filterArea;
 
-        target.filterArea = target.getBounds(true);
+        target.filterArea = element.getBounds(true);
         this.renderer.filter.push(target, alphaMaskFilter);
         target.filterArea = stashFilterArea;
 
