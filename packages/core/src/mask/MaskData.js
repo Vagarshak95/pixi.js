@@ -33,11 +33,42 @@ export class MaskData
 
         /**
          * Whether it belongs to MaskSystem pool
-         * @type {boolean}
+         * @member {boolean}
          */
         this.pooled = false;
 
-        this.reset();
+        /**
+         * Indicator of the type
+         * @member {boolean}
+         */
+        this.isMaskData = true;
+
+        /**
+         * Stencil counter above the mask in stack
+         * @member {number}
+         * @private
+         */
+        this._stencilCounter = 0;
+        /**
+         * Scissor counter above the mask in stack
+         * @member {number}
+         * @private
+         */
+        this._scissorCounter = 0;
+
+        /**
+         * Scissor operation above the mask in stack.
+         * Null if _scissorCounter is zero, rectangle instance if positive.
+         * @member {PIXI.Rectangle}
+         */
+        this._scissorRect = null;
+
+        /**
+         * Targeted element. Temporary variable set by MaskSystem
+         * @member {PIXI.DisplayObject}
+         * @private
+         */
+        this._target = null;
     }
 
     /**
@@ -54,24 +85,26 @@ export class MaskData
             this.autoDetect = true;
         }
 
-        /**
-         * Stencil counter above the mask in stack
-         * @member {number}
-         * @private
-         */
-        this._stencilCounter = 0;
-        /**
-         * Scissor counter above the mask in stack
-         * @member {number}
-         * @private
-         */
-        this._scissorCounter = 0;
-
-        /**
-         * Targeted element. Temporary variable set by MaskSystem
-         * @member {PIXI.DisplayObject}
-         * @private
-         */
         this._target = null;
+    }
+
+    /**
+     * copies counters from maskData above, called from pushMask()
+     * @param {PIXI.MaskData|null} maskAbove
+     */
+    copyCounters(maskAbove)
+    {
+        if (maskAbove)
+        {
+            this._stencilCounter = maskAbove._stencilCounter;
+            this._scissorCounter = maskAbove._scissorCounter;
+            this._scissorRect = maskAbove._scissorRect;
+        }
+        else
+        {
+            this._stencilCounter = 0;
+            this._scissorCounter = 0;
+            this._scissorRect = null;
+        }
     }
 }

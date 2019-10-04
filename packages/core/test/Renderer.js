@@ -113,11 +113,11 @@ describe('PIXI.Renderer', function ()
 
             this.renderer.mask.push(context, maskData);
 
-            expect(this.renderer.mask.scissor).to.equal(true);
+            expect(this.renderer.scissor.getStackLength()).to.equal(1);
 
             this.renderer.mask.pop(context, maskData);
 
-            expect(this.renderer.mask.scissor).to.equal(false);
+            expect(this.renderer.scissor.getStackLength()).to.equal(0);
         });
 
         it('should not use scissor masks with non axis aligned sqares', function ()
@@ -131,7 +131,7 @@ describe('PIXI.Renderer', function ()
 
             this.renderer.mask.push(context, maskData);
 
-            expect(this.renderer.mask.scissor).to.equal(false);
+            expect(this.renderer.scissor.getStackLength()).to.equal(0);
 
             this.renderer.mask.pop(context, maskData);
         });

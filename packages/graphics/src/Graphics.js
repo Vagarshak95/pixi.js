@@ -172,6 +172,12 @@ export class Graphics extends Container
          */
         this.pluginName = 'batch';
 
+        /**
+         * used to fast check if a graphics is.. a graphics!
+         * @member {boolean}
+         */
+        this.isGraphics = true;
+
         // Set default
         this.tint = 0xFFFFFF;
         this.blendMode = BLEND_MODES.NORMAL;
