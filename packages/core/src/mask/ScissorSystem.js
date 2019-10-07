@@ -89,7 +89,8 @@ export class ScissorSystem extends AbstractMaskSystem
         const rt = this.renderer.renderTexture.current;
         const transform = this.renderer.projection.transform;
         let resolution = this.renderer.resolution;
-        let x = 0, y = 0;
+        let x = 0;
+        let y = 0;
 
         if (transform)
         {

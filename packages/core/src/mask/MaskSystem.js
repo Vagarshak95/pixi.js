@@ -56,6 +56,12 @@ export class MaskSystem extends System
          * @readonly
          */
         this.alphaMaskIndex = 0;
+
+        /**
+         * Counter, whether an element tried to pop a mask with wrong target
+         * @member {number}
+         */
+        this.errorCounter = 0;
     }
 
     /**
@@ -128,7 +134,9 @@ export class MaskSystem extends System
 
         if (!maskData || maskData._target !== target)
         {
-            // target mismatch, what to do?
+            this.errorCounter++;
+            // we will report this incident post render
+
             return;
         }
 
@@ -177,12 +185,20 @@ export class MaskSystem extends System
         {
             const matrix = maskObject.worldTransform;
 
-            let rot = Math.atan2(matrix.b, matrix.a);
+            // TODO: move the check to the matrix itself
+            // we are checking that its orthogonal and x rotation is 0 90 180 or 270
+
+            let rotX = Math.atan2(matrix.b, matrix.a);
+            let rotXY = Math.atan2(matrix.d, matrix.c);
 
             // use the nearest degree to 0.01
-            rot = Math.round(rot * (180 / Math.PI) * 100);
+            rotX = Math.round(rotX * (180 / Math.PI) * 100);
+            rotXY = Math.round(rotXY * (180 / Math.PI) * 100) - rotX;
 
-            if (rot % 9000 === 0)
+            rotX = ((rotX % 9000) + 9000) % 9000;
+            rotXY = ((rotXY % 18000) + 18000) % 18000;
+
+            if (rotX === 0 && rotXY === 9000)
             {
                 maskData.type = MASK_TYPES.SCISSOR;
             }
@@ -219,11 +235,25 @@ export class MaskSystem extends System
 
     /**
      * Removes the last filter from the filter stack and doesn't return it.
-     *
      */
     popSpriteMask()
     {
         this.renderer.filter.pop();
         this.alphaMaskIndex--;
+    }
+
+    /**
+     * Checks mask balance after frame rendering
+     */
+    postrender()
+    {
+        if (this.errorCounter > 0)
+        {
+            this.maskStack = [];
+            this.errorCounter = 0;
+
+            console.warn(
+                `PixiJS Error: Number of 'mask.pop()' that did not have corresponding pushes is ${this.errorCounter}`);
+        }
     }
 }

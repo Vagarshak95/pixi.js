@@ -85,6 +85,15 @@ describe('PIXI.Renderer', function ()
 
     describe('Masks', function ()
     {
+        function onePixelMask(worldTransform)
+        {
+            return {
+                isFastRect() { return true; },
+                worldTransform: worldTransform || { a: 1, b: 0, c: 0, d: 1 },
+                getBounds() { return { x: 0, y: 0, width: 1, height: 1 }; },
+            };
+        }
+
         before(function ()
         {
             this.renderer = new Renderer();
@@ -102,16 +111,35 @@ describe('PIXI.Renderer', function ()
             expect(this.renderer.mask.enableScissor).to.equal(true);
         });
 
+        it('should detect wrong mask push/pop', function ()
+        {
+            const context = {};
+            const context2 = {};
+            const maskData = onePixelMask();
+
+            this.renderer.mask.push(context, maskData);
+            this.renderer.mask.push(context2, maskData);
+            this.renderer.mask.pop(context, maskData);
+            this.renderer.mask.pop(context2, maskData);
+
+            expect(this.renderer.mask.errorCounter).to.equal(2);
+        });
+
         it('should use scissor masks with axis aligned squares', function ()
         {
             const context = {};
-            const maskData = {
-                isFastRect() { return true; },
-                worldTransform: { a: 0, b: 0 },
-                getBounds() { return { x: 0, y: 0, width: 0, height: 0 }; },
-            };
+            const maskData = onePixelMask({ a: 1, b: 0, c: 0, d: 1 });
+            const maskData2 = onePixelMask({ a: 0, b: 1, c: 1, d: 0 });
 
             this.renderer.mask.push(context, maskData);
+
+            expect(this.renderer.scissor.getStackLength()).to.equal(1);
+
+            this.renderer.mask.push(context, maskData2);
+
+            expect(this.renderer.scissor.getStackLength()).to.equal(2);
+
+            this.renderer.mask.pop(context, maskData2);
 
             expect(this.renderer.scissor.getStackLength()).to.equal(1);
 
@@ -123,11 +151,7 @@ describe('PIXI.Renderer', function ()
         it('should not use scissor masks with non axis aligned sqares', function ()
         {
             const context = {};
-            const maskData = {
-                isFastRect() { return true; },
-                worldTransform: { a: 0.1, b: 2 },
-                render() { return; },
-            };
+            const maskData = onePixelMask({ a: 0.1, b: 2, c: 2, d: -0.1 });
 
             this.renderer.mask.push(context, maskData);
 
