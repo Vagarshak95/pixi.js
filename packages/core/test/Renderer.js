@@ -1,6 +1,7 @@
 const { Renderer } = require('../');
 const { settings } = require('@pixi/settings');
 const { ENV } = require('@pixi/constants');
+const { Rectangle } = require('@pixi/math');
 const { skipHello } = require('@pixi/utils');
 
 skipHello();
@@ -90,7 +91,7 @@ describe('PIXI.Renderer', function ()
             return {
                 isFastRect() { return true; },
                 worldTransform: worldTransform || { a: 1, b: 0, c: 0, d: 1 },
-                getBounds() { return new PIXI.Rectangle(0, 0, 1, 1); },
+                getBounds() { return new Rectangle(0, 0, 1, 1); },
                 render() { /* nothing*/ },
             };
         }
