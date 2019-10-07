@@ -90,7 +90,8 @@ describe('PIXI.Renderer', function ()
             return {
                 isFastRect() { return true; },
                 worldTransform: worldTransform || { a: 1, b: 0, c: 0, d: 1 },
-                getBounds() { return { x: 0, y: 0, width: 1, height: 1 }; },
+                getBounds() { return new PIXI.Rectangle(0, 0, 1, 1); },
+                render() { /* nothing*/ },
             };
         }
 
