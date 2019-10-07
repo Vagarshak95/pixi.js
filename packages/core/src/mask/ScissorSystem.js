@@ -88,27 +88,25 @@ export class ScissorSystem extends AbstractMaskSystem
         const rect = this.maskStack[this.maskStack.length - 1]._scissorRect;
         const rt = this.renderer.renderTexture.current;
         const transform = this.renderer.projection.transform;
-        let resolution = this.renderer.resolution;
-        let x = rect.x;
-        let y = rect.y;
+        const srcFrame = this.renderer.projection.sourceFrame;
+        const destFrame = this.renderer.projection.destinationFrame;
+        let resolution = rt ? rt.resolution : this.renderer.resolution;
+        let x = ((rect.x - srcFrame.x) * resolution) + destFrame.x;
+        let y = ((rect.y - srcFrame.y) * resolution) + destFrame.y;
 
         if (transform)
         {
-            x += transform.tx;
-            y += transform.ty;
+            x += transform.tx * resolution;
+            y += transform.ty * resolution;
         }
-        if (rt)
+
+        if (!rt)
         {
-            resolution = rt.resolution;
-            y = y * resolution;
-        }
-        else
-        {
-            y = this.renderer.height - ((y + rect.height) * resolution);
+            y = this.renderer.height - y;
         }
 
         this.renderer.gl.scissor(
-            x * resolution,
+            x,
             y,
             rect.width * resolution,
             rect.height * resolution
