@@ -85,16 +85,19 @@ describe('PIXI.systems.MaskSystem', function ()
     it('should not put maskData to pool if it belongs to object', function ()
     {
         const context = {};
-        const maskData = new MaskData();
+        const maskData = new MaskData(onePixelMask({ a: 1, b: 0, c: 0, d: 1 }));
 
         this.renderer.mask.maskDataPool.length = 0;
-        maskData.maskObject = onePixelMask({ a: 1, b: 0, c: 0, d: 1 });
 
-        this.renderer.mask.push(context, maskData);
-        this.renderer.mask.pop(context, maskData);
+        for (let i = 0; i < 2; i++)
+        {
+            // repeat two times just to be sure
+            this.renderer.mask.push(context, maskData);
+            this.renderer.mask.pop(context, maskData);
 
-        expect(maskData._scissorCounter).to.equal(1);
-        expect(this.renderer.mask.maskDataPool.length).to.equal(0);
+            expect(maskData._scissorCounter).to.equal(1);
+            expect(this.renderer.mask.maskDataPool.length).to.equal(0);
+        }
     });
 
     it('should not use scissor masks with non axis aligned sqares', function ()

@@ -10,7 +10,12 @@ import { MASK_TYPES } from '@pixi/constants';
  */
 export class MaskData
 {
-    constructor()
+    /**
+     * Create MaskData
+     *
+     * @param {PIXI.DisplayObject} [maskObject=null] object that describes the mask
+     */
+    constructor(maskObject)
     {
         /**
          * Mask type
@@ -29,7 +34,7 @@ export class MaskData
          * Which element we use to mask
          * @member {PIXI.DisplayObject}
          */
-        this.maskObject = null;
+        this.maskObject = maskObject || null;
 
         /**
          * Whether it belongs to MaskSystem pool
