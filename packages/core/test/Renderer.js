@@ -1,4 +1,4 @@
-const { Renderer } = require('../');
+const { Renderer, MaskData } = require('../');
 const { settings } = require('@pixi/settings');
 const { ENV } = require('@pixi/constants');
 const { Rectangle } = require('@pixi/math');
@@ -117,12 +117,12 @@ describe('PIXI.Renderer', function ()
         {
             const context = {};
             const context2 = {};
-            const maskData = onePixelMask();
+            const maskObject = onePixelMask();
 
-            this.renderer.mask.push(context, maskData);
-            this.renderer.mask.push(context2, maskData);
-            this.renderer.mask.pop(context, maskData);
-            this.renderer.mask.pop(context2, maskData);
+            this.renderer.mask.push(context, maskObject);
+            this.renderer.mask.push(context2, maskObject);
+            this.renderer.mask.pop(context, maskObject);
+            this.renderer.mask.pop(context2, maskObject);
 
             expect(this.renderer.mask.errorCounter).to.equal(2);
         });
@@ -130,36 +130,66 @@ describe('PIXI.Renderer', function ()
         it('should use scissor masks with axis aligned squares', function ()
         {
             const context = {};
-            const maskData = onePixelMask({ a: 1, b: 0, c: 0, d: 1 });
-            const maskData2 = onePixelMask({ a: 0, b: 1, c: 1, d: 0 });
+            const maskObject = onePixelMask({ a: 1, b: 0, c: 0, d: 1 });
+            const maskObject2 = onePixelMask({ a: 0, b: 1, c: 1, d: 0 });
 
-            this.renderer.mask.push(context, maskData);
+            this.renderer.mask.push(context, maskObject);
 
             expect(this.renderer.scissor.getStackLength()).to.equal(1);
 
-            this.renderer.mask.push(context, maskData2);
+            this.renderer.mask.push(context, maskObject2);
 
             expect(this.renderer.scissor.getStackLength()).to.equal(2);
 
-            this.renderer.mask.pop(context, maskData2);
+            this.renderer.mask.pop(context, maskObject2);
 
             expect(this.renderer.scissor.getStackLength()).to.equal(1);
 
-            this.renderer.mask.pop(context, maskData);
+            this.renderer.mask.pop(context, maskObject);
 
             expect(this.renderer.scissor.getStackLength()).to.equal(0);
+        });
+
+        it('should return maskData to pool if it does not belong in the object', function ()
+        {
+            const context = {};
+            const maskObject = onePixelMask({ a: 1, b: 0, c: 0, d: 1 });
+
+            this.renderer.mask.maskDataPool.length = 0;
+            this.renderer.mask.push(context, maskObject);
+            this.renderer.mask.pop(context, maskObject);
+
+            const maskData = this.renderer.mask.maskDataPool[0];
+
+            expect(maskData).to.be.notnull;
+            expect(maskData._scissorCounter).to.equal(1);
+        });
+
+        it('should not put maskData to pool if it belongs to object', function ()
+        {
+            const context = {};
+            const maskData = new MaskData();
+
+            this.renderer.mask.maskDataPool.length = 0;
+            maskData.maskObject = onePixelMask({ a: 1, b: 0, c: 0, d: 1 });
+
+            this.renderer.mask.push(context, maskData);
+            this.renderer.mask.pop(context, maskData);
+
+            expect(maskData._scissorCounter).to.equal(1);
+            expect(this.renderer.mask.maskDataPool.length).to.equal(0);
         });
 
         it('should not use scissor masks with non axis aligned sqares', function ()
         {
             const context = {};
-            const maskData = onePixelMask({ a: 0.1, b: 2, c: 2, d: -0.1 });
+            const maskObject = onePixelMask({ a: 0.1, b: 2, c: 2, d: -0.1 });
 
-            this.renderer.mask.push(context, maskData);
+            this.renderer.mask.push(context, maskObject);
 
             expect(this.renderer.scissor.getStackLength()).to.equal(0);
 
-            this.renderer.mask.pop(context, maskData);
+            this.renderer.mask.pop(context, maskObject);
         });
     });
 });
